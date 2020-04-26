@@ -14,14 +14,38 @@ class App extends React.Component {
    this.search = this.search.bind(this)
   }
 
+  getRepos() {
+    axios.get('http://localhost:1128/repos')
+    .then((res) => {
+      this.setState({
+        repos: res.data
+      })
+    })
+    .catch((error) => {
+      console.error(error)
+    })
+  }
+
   search (term) {
 
-    console.log(`${term} was searched`);
+    //console.log(`${term} was searched`);
 
     axios.post('http://localhost:1128/repos',{
       name: term
     })
-    .then(() => {console.log('working in client')})
+    .then(this.getRepos)
+    .catch((error) => {console.error(error)})
+
+  }
+
+  componentDidMount() {
+    axios.get('http://localhost:1128/repos')
+    .then((res) => {
+      console.log(res.data, 'Data from start')
+      this.setState({
+        repos: res.data
+      })
+    })
 
   }
 

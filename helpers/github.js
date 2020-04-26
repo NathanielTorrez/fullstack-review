@@ -1,39 +1,38 @@
 const request = require('request');
 const config = require('../config.js');
+const database = require('../database/index.js')
 
-let getReposByUsername = (name) => {
-  // TODO - Use the request module to request repos for a specific
-  // user from the github API
+let getReposByUsername = (name, callback) => {
 
-  // The options object has been provided to help you out,
-  // but you'll have to fill in the URL
-
-  // we need to make a request to githubs api for a username search with name
-  // we will need full_name, owners.repos_url, forks
-
-
+//DEFINES THE OPTIONS FOR REQUEST
   let options = {
-    url: `https://api.github.com/search/repositories?q=${name}`,
+    url: `https://api.github.com/users/${name}/repos`,
     headers: {
       'User-Agent': 'request',
       'Authorization': `token ${config.TOKEN}`
     }
   };
 
-  // call back will call the save method, this will save it to the database
 
-  let callback = (error,response, body) => {
-     if (error) {
-       console.error(error)
-     } else {
+  request(options, callback)
+}
 
-         var newBody = JSON.parse(body);
-       console.log(newBody.items[0])
-     }
-  };
+let filterData = (data) => {
+  var result = [];
 
-  var info = request(options, callback)
-  //console.log(info)
+  for ( var i = 0; i < data.length; i++) {
+
+    let conformedObj = {
+      id: data[i].id,
+      name: data[i].full_name,
+      url: data[i].owner.repos_url,
+      description: data[i].description,
+      forks: data[i].forks
+    }
+     result.push(conformedObj)
+  }
+  return result
 }
 
 module.exports.getReposByUsername = getReposByUsername;
+module.exports.filterData         = filterData;

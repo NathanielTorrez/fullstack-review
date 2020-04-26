@@ -12,6 +12,7 @@ db.on('error', console.error.bind(console, 'connection error'));
 
 let repoSchema = mongoose.Schema({
   // TODO: your schema here!
+  id: Number,
   full_name: String,
   url: String,
   description: String,
@@ -21,30 +22,27 @@ let repoSchema = mongoose.Schema({
 
 let Repo = mongoose.model('Repo', repoSchema);
 
-let save = (info) => {
-  // TODO: Your code here
-  // This function should save a repo or repos to
-  // the MongoDB
+let save = (info, cb) => {
 
-  // create the new instance to save
+ Repo.create(info, cb);
 
-  let newRepo = new Repo({
-    full_name: info.full_name,
-    url: info.url ,
-    description: info.description,
-    forks: info.forks
-  })
+  };
 
-  // save the new instance to the database
+let getAll = (cb) => {
 
-  newRepo.save( (err) => {
+
+  Repo.find({}, function (err, repos) {
     if (err) {
-      console.log(err)
+      console.log('Unable to find repos');
+      cb(err);
     } else {
-      console.log('success')
+      console.log('Found repos');
+      cb(null, repos);
     }
-  })
-
+  });
 }
 
-module.exports.save = save;
+module.exports = {
+  save: save,
+  getAll: getAll
+}
